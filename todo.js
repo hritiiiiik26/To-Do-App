@@ -1,11 +1,37 @@
-
 const todoInput = document.getElementById("todo-input");
 
-const todolistEl = document.getElementById("todos-list");
+const todolistElement = document.getElementById("todos-list");
 
 let todos = JSON.parse(localStorage.getItem('todos') )|| [];
 let editId =-1;
 
+if(todos.length===0){
+fetch("https://jsonplaceholder.typicode.com/todos")
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error('Network response was not OK');
+    }
+    return response.json();
+  })
+  .then((data) => {
+    // Process the received data
+    
+    data.forEach((dat) => {
+      todos.push({
+        value: dat.title,
+        color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+        checked: false,
+      });
+    });
+    // , console.log(data.length)
+    console.log(todos.length);
+    renderTodos();
+  })
+  .catch(error => {
+    // Handle any errors that occurred during the fetch request
+    console.log('Error:', error.message);
+  });
+}
 //First render as we might have already exisiting todos in storage
 renderTodos();
 function addTodo() {
@@ -46,17 +72,18 @@ function addTodo() {
     todoInput.value = "";
   }
 }
+
 function renderTodos() {
 
     if(todos.length===0){
-        todolistEl.innerHTML= '<center>Nothing To-Do</center>'
+        todolistElement.innerHTML= '<center>Nothing To-Do</center>'
         return;
     }
   //Clear element before a re render
 
-  todolistEl.innerHTML = "";
+  todolistElement.innerHTML = "";
   todos.forEach((todo, index) => {
-    todolistEl.innerHTML += `
+    todolistElement.innerHTML += `
   <div class ="todo" id =${index}>
   <i class="bi ${
     todo.checked ? "bi-check-circle-fill" : "bi-circle"
@@ -71,7 +98,7 @@ function renderTodos() {
 
 //CLICK EVENT LISTENER FOR ALL THE TODOS
 
-todolistEl.addEventListener("click", (event) => {
+todolistElement.addEventListener("click", (event) => {
   const target = event.target;
   const parentElement = target.parentNode;
  
@@ -142,3 +169,14 @@ submitBtn.addEventListener("click", (e) => {
     
     localStorage.setItem('todos',JSON.stringify(todos));
   });
+
+  todoInput.addEventListener("keydown", function (e) {
+    if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+      // e.preventDefault();
+    console.log("working")
+    addTodo();
+    renderTodos();
+    localStorage.setItem('todos',JSON.stringify(todos));
+
+  }   
+});
