@@ -46,7 +46,7 @@ function addTodo() {
   const priorityValue = prioritySelect.value;
 
   //check if todo is empty
-  const isEmpty = todoValue === "";
+  const isEmpty = todoValue === "" ||dateValue==="" || priorityValue==="" ||categoryFilter.value==="";
 
   //check for duplicate
   const isDuplicate = todos.some(
@@ -57,7 +57,7 @@ function addTodo() {
   );
 
   if (isEmpty) {
-    alert("Todo's input is empty");
+    alert("Please enter all input fields");
   } else if (isDuplicate) {
     alert("entry already exists");
   } else {
