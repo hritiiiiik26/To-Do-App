@@ -12,3 +12,4 @@ added filter based on duedate,category,priority.
 added Sort by duedate,priority.
 added activity log.
 added view backlog feature.
+added drag and drop features for task.
