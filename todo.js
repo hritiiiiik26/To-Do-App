@@ -318,7 +318,9 @@ document.getElementById("sort-by").addEventListener("change", function () {
 //activity log
 
 
-let activityLog = JSON.parse(localStorage.getItem('activityLog')).slice(-5) || [];
+let activityLog = (JSON.parse(localStorage.getItem('activityLog'))|| []).slice(-5);
+
+  // activityLog=activityLog.slice(-5);
 activityLog.reverse();
 
 // Function to add an activity log
