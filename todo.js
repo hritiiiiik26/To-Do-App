@@ -126,7 +126,7 @@ function renderFilteredTodos(filteredTodos) {
 
   filteredTodos.forEach((todo, index) => {
     todolistElement.innerHTML += `
-      <div class="todo" id="${index}">
+      <div class="todo" id="${index}" draggable="true">
         <i class="bi ${todo.checked ? "bi-check-circle-fill" : "bi-circle"}" style="color:${todo.color}" data-action="check"></i>
         <span class="${todo.checked ? "checked" : ""}" data-action="check">${todo.value}</span>
         <span class="${todo.checked ? "checked" : ""}">${todo.date}</span> 
@@ -178,7 +178,7 @@ function renderAllTodos(todos) {
 
   todos.forEach((todo, index) => {
     todolistElement.innerHTML += `
-      <div class="todo" id="${index}">
+      <div class="todo" id="${index}" draggable="true">
         <i class="bi ${todo.checked ? "bi-check-circle-fill" : "bi-circle"}" style="color:${todo.color}" data-action="check"></i>
         <span class="${todo.checked ? "checked" : ""}" data-action="check">${todo.value}</span>
         <span class="${todo.checked ? "checked" : ""}">${todo.date}</span> 
@@ -317,12 +317,15 @@ document.getElementById("sort-by").addEventListener("change", function () {
 
 //activity log
 
-const activityLog = []; // Array to store activity logs
+
+let activityLog = JSON.parse(localStorage.getItem('activityLog')).slice(-5) || [];
+activityLog.reverse();
 
 // Function to add an activity log
 function logActivity(type, details) {
   const timestamp = new Date().toISOString();
   activityLog.push({ timestamp, type, details });
+  localStorage.setItem('activityLog', JSON.stringify(activityLog));
 }
 
 function displayActivityLogs() {
@@ -345,8 +348,8 @@ function displayActivityLogs() {
 
   let get = document.getElementById("activity-log-container");
 setTimeout(() => {
-  get.style.visibility='hidden';
-}, 3000);
+  get.style.display='none';
+}, 6000);
 }
 
 
@@ -381,6 +384,7 @@ searchBtn.addEventListener("click", performSearch);
 
 //backlog
 function renderBacklogs() {
+  console.log("bl")
   const backlogs = getBacklogs();
 
   if (backlogs.length === 0) {
@@ -397,6 +401,8 @@ function renderBacklogs() {
         <span>${backlog.date}</span>
         <span class="priority">Priority:${backlog.priority}</span>
         <span class="category">Category:${backlog.category}</span>
+        <i class="bi bi-pencil-square" data-action="edit"></i>
+        <i class="bi bi-trash" data-action="delete"></i>
       </div>
     `;
   });
@@ -413,7 +419,64 @@ function getBacklogs() {
   return backlogs;
 }
 
-//subtask
+
+
+
+// Add event listeners to handle drag and drop operations
+const todosList = document.getElementById("todos-list");
+
+todosList.addEventListener("dragstart", handleDragStart);
+
+todosList.addEventListener("dragover", handleDragOver);
+todosList.addEventListener("dragenter", handleDragEnter);
+todosList.addEventListener("dragleave", handleDragLeave);
+todosList.addEventListener("drop", handleDrop);
+
+let dragItemId = null;
+let dropTarget = null;
+
+function handleDragStart(event) {
+  console.log('dragging')
+  dragItemId = event.target.id;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", ""); // Use a custom data type (text/plain) and set an empty value
+  event.dataTransfer.setDragImage(new Image(), 0, 0);
+}
+
+function handleDragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+}
+
+function handleDragEnter(event) {
+  event.preventDefault();
+  const target = event.target.closest(".todo");
+  if(target===null)return;
+  dropTarget = target;
+  target.classList.add("drop-target");
+}
+
+function handleDragLeave(event) {
+  event.preventDefault();
+  const target = event.target.closest(".todo");
+  if (target === dropTarget) {
+    dropTarget.classList.remove("drop-target");
+    dropTarget = null;
+  }
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  const target = event.target.closest(".todo");
+  if (target === dropTarget) {
+    const draggedItem = document.getElementById(dragItemId);
+    target.parentNode.insertBefore(draggedItem, target);
+    dropTarget.classList.remove("drop-target");
+  }
+}
+
+
+
 
 
 
